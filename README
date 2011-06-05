@@ -1,0 +1,83 @@
+NAME
+    perl5 - Use a Bunch of Modules in One Go
+
+SYNOPSIS
+        use perl5;
+        use perl5-i;
+        use perl5-2i;
+        use perl5-ingy;
+        use perl5-yourShinyPlugin;
+
+DESCRIPTION
+    The "perl5" module lets you "use" a well known set of modules in one
+    command.
+
+    It allows people to create plugins like "perl5::foo" and "perl5::bar"
+    that are sets of useful modules that have been tested together and are
+    known to create joy.
+
+USAGE
+    This:
+
+        use perl5-foo;
+
+    Is equivalent in Perl to:
+
+        use perl5 '-foo';
+
+    The "perl5" module takes the first argument in the "use" command, and
+    uses it to find a plugin, like "perl5::foo" in this case.
+
+    "perl5::foo" is typically just a subclass of perl5::base. It invoke a
+    set of modules for its caller.
+
+    If you use "perl5" with no arguments, like this:
+
+        use perl5;
+
+    It is the same as saying:
+
+        use perl5-base
+
+    In other words, it just assumes the perl5 plugin base class. This is
+    actually useful. It is equivalent to:
+
+        use 5.010;
+        use strict;
+        use warnings;
+
+INSPIRATION
+    This module was inspired by Michael Schwern's perl5i, and the talk he
+    gave about it at the 2010 OSDC in Melbourne. By "inspired" I mean that I
+    was perturbed by Schwern's non-TMTOWTDI attitude towards choosing a
+    standard set of Perl modules for all of us.
+
+        THIS IS PERL! THERE ARE NO STANDARDS!
+
+    ...and I told him so. I also promised that I would show him my feelings
+    in code. Schwern, *this* is how I feel!
+
+    For extra credit, I will release perl5::i, that will attempt to be
+    equivalent to perl5i::latest (except better at golf).
+
+    DISCLAIMER: Mr Schwern has my full love and respect, and knows it well.
+    :)
+
+SEE ALSO
+    *   perl5i
+
+    *   perl5::i
+
+    *   perl5::ingy
+
+AUTHOR
+    Ingy döt Net <ingy@ingy.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2010. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+
