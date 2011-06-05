@@ -14,7 +14,7 @@ use 5.010_000;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # TODO:
 # - Provide plugin version number support

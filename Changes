@@ -1,4 +1,9 @@
 ---
+version: 0.02
+date:    Mon Jun  6 02:07:57 EST 2011
+changes:
+- Release with major bug fix in Module::Package
+---
 version: 0.01
 date:    Sun Jun  5 21:43:19 EST 2011
 changes:
