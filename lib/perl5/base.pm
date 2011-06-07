@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use feature ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub import {
     my $class = shift;
