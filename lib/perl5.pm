@@ -14,22 +14,52 @@ use 5.010_000;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-# TODO:
-# - Provide plugin version number support
-#   use perl5-foo => 1.23, ...; # maybe
 sub import {
-    my ($package, $perl5) = @_;
-    $perl5 ||= '-base';
-    die "'$perl5' is an invalid first argument to 'use perl5...'"
-        unless $perl5 =~ /^-(\w+)$/;
+    my ($class, $perl5) = @_;
+    my $package = caller;
+
+    if ($class ne 'perl5') {
+        (my $usage = $class) =~ s/::/-/;
+        die "Don't 'use $class'. Try 'use $usage'";
+    }
+
+    if (not defined $perl5) {
+        strict->import;
+        warnings->import;
+        feature->import(':5.10');
+        return;
+    }
+
+    if (not $perl5 =~ /^-(\w+)$/) {
+        die "'$perl5' is an invalid first argument to 'use perl5...'"
+    }
+
     my $perl5_class = "perl5::$1";
     eval "use $perl5_class (); 1" or die $@;
-    splice(@_, 0, 1, $perl5_class);
-    no strict 'refs';
-    goto &{"${perl5_class}::import"};
+
+    {
+        no strict 'refs';
+        if (defined &{"${perl5_class}::import"}) {
+            splice(@_, 0, 1, $perl5_class);
+            goto &{"${perl5_class}::import"};
+        }
+    }
+
+    if (my $code = $perl5_class->code) {
+        strict->import;
+        warnings->import;
+        feature->import(':5.10');
+    eval <<"..." or die $@;
+package $package;
+$code
+;1;
+...
+    }
 }
+
+use constant code => '';
 
 1;
 
@@ -50,6 +80,8 @@ It allows people to create plugins like C<perl5::foo> and C<perl5::bar> that
 are sets of useful modules that have been tested together and are known to
 create joy.
 
+This module, C<perl5>, is generally the base class to such a plugin.
+
 =head1 USAGE
 
 This:
@@ -63,8 +95,8 @@ Is equivalent in Perl to:
 The C<perl5> module takes the first argument in the C<use> command, and uses
 it to find a plugin, like C<perl5::foo> in this case.
 
-C<perl5::foo> is typically just a subclass of L<perl5::base>. It invoke a set
-of modules for its caller.
+C<perl5::foo> is typically just a subclass of L<perl5>. It invoke a set of
+modules for its caller.
 
 If you use C<perl5> with no arguments, like this:
 
@@ -72,14 +104,32 @@ If you use C<perl5> with no arguments, like this:
 
 It is the same as saying:
 
-    use perl5-base
-
-In other words, it just assumes the perl5 plugin base class. This is actually
-useful. It is equivalent to:
-
     use 5.010;
     use strict;
     use warnings;
+
+=head1 API
+
+To create a plugin called C<perl5::foo> that gets called like this:
+
+    use perl5-foo;
+
+Write some code like this:
+
+    package perl5::foo;
+    use perl5;
+    our $VERSION = 0.12;
+    our @ISA = qw[perl5];
+
+    # These is the code that will be run when people use your module:
+    sub code {
+        return <<"...";
+    use SomeModule 0.22;
+    use OtherModule 0.33 option1 => 2;
+    ...
+    }
+
+    1;
 
 =head1 INSPIRATION
 

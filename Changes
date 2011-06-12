@@ -1,4 +1,10 @@
 ---
+version: 0.04
+date:    Sun Jun 12 13:46:16 EST 2011
+changes:
+- Refactor things to be sane API.
+- Got rid of perl5::base.
+---
 version: 0.03
 date:    Tue Jun  7 17:34:37 EST 2011
 changes:

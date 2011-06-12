@@ -16,6 +16,8 @@ DESCRIPTION
     that are sets of useful modules that have been tested together and are
     known to create joy.
 
+    This module, "perl5", is generally the base class to such a plugin.
+
 USAGE
     This:
 
@@ -28,8 +30,8 @@ USAGE
     The "perl5" module takes the first argument in the "use" command, and
     uses it to find a plugin, like "perl5::foo" in this case.
 
-    "perl5::foo" is typically just a subclass of perl5::base. It invoke a
-    set of modules for its caller.
+    "perl5::foo" is typically just a subclass of perl5. It invoke a set of
+    modules for its caller.
 
     If you use "perl5" with no arguments, like this:
 
@@ -37,14 +39,31 @@ USAGE
 
     It is the same as saying:
 
-        use perl5-base
-
-    In other words, it just assumes the perl5 plugin base class. This is
-    actually useful. It is equivalent to:
-
         use 5.010;
         use strict;
         use warnings;
+
+API
+    To create a plugin called "perl5::foo" that gets called like this:
+
+        use perl5-foo;
+
+    Write some code like this:
+
+        package perl5::foo;
+        use perl5;
+        our $VERSION = 0.12;
+        our @ISA = qw[perl5];
+
+        # These is the code that will be run when people use your module:
+        sub code {
+            return <<"...";
+        use SomeModule 0.22;
+        use OtherModule 0.33 option1 => 2;
+        ...
+        }
+
+        1;
 
 INSPIRATION
     This module was inspired by Michael Schwern's perl5i, and the talk he
