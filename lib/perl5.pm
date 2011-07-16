@@ -3,37 +3,78 @@
 # abstract:  Use a Bunch of Modules in One Go
 # author:    Ingy döt Net <ingy@ingy.net>
 # license:   perl
-# copyright: 2010
+# copyright: 2011
 # see:
 # - perl5i
 # - perl5::i
 # - perl5::ingy
 
+use v5.10.0;
 package perl5;
-use 5.010_000;
 use strict;
 use warnings;
+use feature ();
 
-our $VERSION = '0.04';
+use version 0.77; our $VERSION = version->parse('0.05');
+
+my $requested_perl_version = 0;
+
+sub VERSION {
+    my ($class, $version) = @_;
+    $version = version->parse($version);
+    if ($version <= 9.999999) {
+        my $this_version = do {
+            no strict 'refs';
+            version->parse(${$class . '::VERSION'});
+        };
+        if ($version > $this_version) {
+            require Carp;
+            Carp::croak(
+                "$class version $version required" .
+                "--this is only version $this_version"
+            );
+        }
+    }
+    else {
+        $requested_perl_version = $version;
+    }
+}
 
 sub import {
-    my ($class, $perl5) = @_;
+    my ($class, $arg) = @_;
     my $package = caller;
+
+    if (defined $arg) {
+        my $version = $arg;
+        $version =~ s/^-//;
+        if (version::is_lax($version)) {
+            $requested_perl_version = version->parse($version);
+            splice(@_, 1, 1);
+            $arg = $_[1];
+        }
+    }
+    if ($requested_perl_version) {
+        my $version = $requested_perl_version->normal;
+        $requested_perl_version = 0;
+        $version =~ s/^v/v5./ or die;
+        eval "use $version";
+        die $@ if $@;
+    }
 
     if ($class ne 'perl5') {
         (my $usage = $class) =~ s/::/-/;
         die "Don't 'use $class'. Try 'use $usage'";
     }
 
-    if (not defined $perl5) {
+    if (not defined $arg) {
         strict->import;
         warnings->import;
         feature->import(':5.10');
         return;
     }
 
-    if (not $perl5 =~ /^-(\w+)$/) {
-        die "'$perl5' is an invalid first argument to 'use perl5...'"
+    if (not $arg =~ /^-(\w+)$/) {
+        die "'$arg' is an invalid first argument to 'use perl5...'"
     }
 
     my $perl5_class = "perl5::$1";
@@ -65,11 +106,23 @@ use constant code => '';
 
 =head1 SYNOPSIS
 
-    use perl5;
+Use a version of Perl and its feature set:
+
+    use perl5;      # Same as 'use perl5 v5.10.0;'
+    use perl5 v14.1;
+    use perl5 14.1;
+    use perl5-14.1;
+
+Use a bundled feature set from a C<perl5> plugin:
+
     use perl5-i;
     use perl5-2i;
     use perl5-ingy;
     use perl5-yourShinyPlugin;
+
+Or both:
+
+    use perl5-14.1 -shiny;
 
 =head1 DESCRIPTION
 
@@ -95,8 +148,8 @@ Is equivalent in Perl to:
 The C<perl5> module takes the first argument in the C<use> command, and uses
 it to find a plugin, like C<perl5::foo> in this case.
 
-C<perl5::foo> is typically just a subclass of L<perl5>. It invoke a set of
-modules for its caller.
+C<perl5::foo> is typically just a subclass of L<perl5::base>. It invoke a set
+of modules for its caller.
 
 If you use C<perl5> with no arguments, like this:
 
@@ -108,6 +161,17 @@ It is the same as saying:
     use strict;
     use warnings;
 
+If you use it with a version, like this:
+
+    use perl5 v14;
+
+It is the same as saying:
+
+    use v5.14;
+    use strict;
+    use warnings;
+    use feature ':5.14';
+
 =head1 API
 
 To create a plugin called C<perl5::foo> that gets called like this:
@@ -117,9 +181,8 @@ To create a plugin called C<perl5::foo> that gets called like this:
 Write some code like this:
 
     package perl5::foo;
-    use perl5;
+    use base 'perl5';
     our $VERSION = 0.12;
-    our @ISA = qw[perl5];
 
     # These is the code that will be run when people use your module:
     sub code {
@@ -141,9 +204,10 @@ of Perl modules for all of us.
     THIS IS PERL! THERE ARE NO STANDARDS!
 
 ...and I told him so. I also promised that I would show him my feelings in
-code. Schwern, I<this> is how I feel!
-
-For extra credit, I will release perl5::i, that will attempt to be equivalent
-to perl5i::latest (except better at golf).
+code. Schwern, I<this> is how I feel! See also L<perl5::i>.
 
 DISCLAIMER: Mr Schwern has my full love and respect, and knows it well. :)
+
+=head1 THANKS
+
+Special thanks to mst, audreyt and obra for ideas and support.

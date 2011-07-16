@@ -1,4 +1,9 @@
 ---
+version: 0.05
+date:    
+changes:
+- Support 'use perl5 v10.0' usage
+---
 version: 0.04
 date:    Sun Jun 12 13:46:16 EST 2011
 changes:
