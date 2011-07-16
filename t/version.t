@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 16;
 
 
 test_usage($_) for split "\n", <<'';
@@ -6,6 +6,16 @@ use perl5 v90.0;
 use perl5 90.0;
 use perl5 '90.0';
 use perl5-90.0;
+use perl5 v90.0 -xyzzy;
+use perl5 90.0 -xyzzy;
+use perl5 90.0, -xyzzy;
+use perl5 90.0-xyzzy;
+use perl5 '90.0' -xyzzy;
+use perl5 '90.0',-xyzzy;
+use perl5 '90.0'-xyzzy;
+use perl5-90.0 -xyzzy;
+use perl5-90.0,-xyzzy;
+use perl5-90.0-xyzzy;
 
 sub test_usage {
     my $usage = shift;
