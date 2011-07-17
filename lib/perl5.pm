@@ -15,7 +15,7 @@ use strict;
 use warnings;
 use feature ();
 
-use version 0.77; our $VERSION = version->parse('0.05');
+use version 0.77; our $VERSION = version->parse('0.05')->stringify;
 
 my $requested_perl_version = 0;
 
@@ -54,9 +54,8 @@ sub import {
         }
     }
     if ($requested_perl_version) {
-        my $version = $requested_perl_version->normal;
+        my $version = $requested_perl_version->numify / 1000 + 5;
         $requested_perl_version = 0;
-        $version =~ s/^v/v5./ or die;
         eval "use $version";
         die $@ if $@;
     }
@@ -122,7 +121,7 @@ Use a bundled feature set from a C<perl5> plugin:
 
 Or both:
 
-    use perl5-14.1 -shiny;
+    use perl5 v14.1 -shiny;
 
 =head1 DESCRIPTION
 

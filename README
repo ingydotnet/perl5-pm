@@ -18,7 +18,7 @@ SYNOPSIS
 
     Or both:
 
-        use perl5-14.1 -shiny;
+        use perl5 v14.1 -shiny;
 
 DESCRIPTION
     The "perl5" module lets you "use" a well known set of modules in one

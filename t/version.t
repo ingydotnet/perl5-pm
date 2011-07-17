@@ -1,7 +1,35 @@
-use Test::More tests => 16;
+use Test::More tests => 31;
+use lib 't/lib';
 
+test_usage1($_) for split "\n", <<'';
+use perl5 v10;
+use perl5 10;
+use perl5 '10';
+use perl5-10;
+use perl5 v10.0;
+use perl5 10.0;
+use perl5 '10.0';
+use perl5-10.0;
+use perl5 v10 -xyzzy;
+use perl5 10 -xyzzy;
+use perl5 '10' => -xyzzy;
+use perl5-10 => -xyzzy;
+use perl5 v10.0 -xyzzy;
+use perl5 10.0 -xyzzy;
+use perl5 '10.0' => -xyzzy;
+use perl5-10.0 => -xyzzy;
+use perl5;
+use perl5-xyzzy;
 
-test_usage($_) for split "\n", <<'';
+sub test_usage1 {
+    my $usage = shift;
+    eval $usage;
+    my $error = $@;
+    diag($@) if $@;
+    ok not($@), "Usage: '$usage' is ok";
+}
+
+test_usage2($_) for split "\n", <<'';
 use perl5 v90.0;
 use perl5 90.0;
 use perl5 '90.0';
@@ -9,15 +37,12 @@ use perl5-90.0;
 use perl5 v90.0 -xyzzy;
 use perl5 90.0 -xyzzy;
 use perl5 90.0, -xyzzy;
-use perl5 90.0-xyzzy;
-use perl5 '90.0' -xyzzy;
 use perl5 '90.0',-xyzzy;
-use perl5 '90.0'-xyzzy;
-use perl5-90.0 -xyzzy;
+use perl5 '90.0' => -xyzzy;
+use perl5-90.0 => -xyzzy;
 use perl5-90.0,-xyzzy;
-use perl5-90.0-xyzzy;
 
-sub test_usage {
+sub test_usage2 {
     my $usage = shift;
     eval $usage;
     my $error = $@;
@@ -25,7 +50,7 @@ sub test_usage {
         fail "'$usage' failed to fail";
         return;
     }
-    like $error, qr/\QPerl v5.90.0.0 required--this is only v5.\E/,
+    like $error, qr/\QPerl v5.90.0 required--this is only v5.\E/,
         "'$usage' usage failed appropriately";
 }
 
