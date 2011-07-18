@@ -86,13 +86,11 @@ sub import {
     goto $class->can('importer');
 }
 
+sub importee {}
 sub importer {
-    my ($class) = @_;
-
-    my @imports = $class->imports;
-
+    my $class = shift;
+    my @imports = scalar(@_) ? @_ : $class->imports;
     my @importee;
-    sub importee {}
 
     while (@imports) {
         my $name = shift(@imports);
@@ -107,6 +105,7 @@ sub importer {
             goto $name->can('import');
         }
     }
+
     importee();
 }
 
