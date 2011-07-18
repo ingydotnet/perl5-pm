@@ -77,12 +77,16 @@ API
         use base 'perl5';
         our $VERSION = 0.12;
 
-        # These is the code that will be run when people use your module:
-        sub code {
-            return <<"...";
-        use SomeModule 0.22;
-        use OtherModule 0.33 option1 => 2;
-        ...
+        # These is the list of modules (with optional version and arguments)
+        sub imports {
+            return (
+                strict =>
+                warnings =>
+                features => [':5.10'],
+                SomeModule => 0.22,
+                OtherModule => 0.33, [option1 => 2],
+                Module => [],   # Don't invoke Module's import() method
+            );
         }
 
         1;

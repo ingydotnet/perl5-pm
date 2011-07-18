@@ -1,4 +1,12 @@
 ---
+version: 0.06
+date:    
+changes:
+- Change $VERSION layout back to normal.
+- Refactor versioning.
+- Use a post hook wrapping goto chain like rig.pm
+- Simplify the API
+---
 version: 0.05
 date:    Sun Jul 17 12:10:30 PDT 2011
 changes:

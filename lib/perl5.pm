@@ -73,53 +73,50 @@ sub import {
         (my $usage = $class) =~ s/::/-/;
         die "Don't 'use $class'. Try 'use $usage'";
     }
+    die "Two many arguments for 'use perl5...'"
+        if @_;
 
-    if (not defined $arg) {
-        strict->import;
-        warnings->import;
-        feature->import(':5.10');
-        return;
-    }
+    my $subclass =
+        not(defined($arg)) ? __PACKAGE__ :
+        $arg =~ /^-(\w+)$/ ?__PACKAGE__ . "::$1" :
+        die "'$arg' is an invalid first argument to 'use perl5...'";
+    eval "require $subclass; 1" or die $@;
 
-    if (not $arg =~ /^-(\w+)$/) {
-        die "'$arg' is an invalid first argument to 'use perl5...'"
-    }
-
-    my $perl5_class = "perl5::$1";
-    eval "use $perl5_class (); 1" or die $@;
-
-    {
-        no strict 'refs';
-        if (defined &{"${perl5_class}::import"}) {
-            unshift(@_, $perl5_class);
-            goto &{"${perl5_class}::import"};
-        }
-    }
-
-    if (my $code = $perl5_class->code) {
-        strict->import;
-        warnings->import;
-        feature->import(':5.10');
-    eval <<"..." or die $@;
-package $package;
-$code
-;1;
-...
-    }
+    @_ = ($subclass);
+    goto $class->can('importer');
 }
 
 sub importer {
+    my ($class) = @_;
+
+    my @imports = $class->imports;
+
+    my @importee;
+    sub importee {}
+
+    while (@imports) {
+        my $name = shift(@imports);
+        my $version = (@imports and version::is_lax($imports[0]))
+            ? version->parse(shift(@imports))->numify : '';
+        my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
+            ? shift(@imports) : undef;
+        push @importee, wrap importee => post => sub {
+            eval "use $name $version (); 1" or die $@;
+            return if $arguments and not @$arguments;
+            @_ = ($name, @{$arguments || []});
+            goto $name->can('import');
+        }
+    }
+    importee();
 }
 
 sub imports {
-    return [
+    return (
         'strict',
         'warnings',
         'feature' => [':5.10'],
-    ];
+    );
 }
-
-use constant code => '';
 
 1;
 
@@ -203,12 +200,16 @@ Write some code like this:
     use base 'perl5';
     our $VERSION = 0.12;
 
-    # These is the code that will be run when people use your module:
-    sub code {
-        return <<"...";
-    use SomeModule 0.22;
-    use OtherModule 0.33 option1 => 2;
-    ...
+    # These is the list of modules (with optional version and arguments)
+    sub imports {
+        return (
+            strict =>
+            warnings =>
+            features => [':5.10'],
+            SomeModule => 0.22,
+            OtherModule => 0.33, [option1 => 2],
+            Module => [],   # Don't invoke Module's import() method
+        );
     }
 
     1;
