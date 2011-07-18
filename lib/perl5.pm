@@ -86,11 +86,11 @@ sub import {
     goto $class->can('importer');
 }
 
-sub importee {}
+sub important {}
 sub importer {
     my $class = shift;
     my @imports = scalar(@_) ? @_ : $class->imports;
-    my @importee;
+    my @wrappers;
 
     while (@imports) {
         my $name = shift(@imports);
@@ -98,7 +98,7 @@ sub importer {
             ? version->parse(shift(@imports))->numify : '';
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
             ? shift(@imports) : undef;
-        push @importee, wrap importee => post => sub {
+        push @wrappers, wrap important => post => sub {
             eval "use $name $version (); 1" or die $@;
             return if $arguments and not @$arguments;
             @_ = ($name, @{$arguments || []});
@@ -106,7 +106,8 @@ sub importer {
         }
     }
 
-    importee();
+    @_ = @wrappers;
+    goto &important;
 }
 
 sub imports {
