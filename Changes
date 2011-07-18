@@ -1,6 +1,6 @@
 ---
 version: 0.06
-date:    
+date:    Sun Jul 17 22:36:56 PDT 2011
 changes:
 - Change $VERSION layout back to normal.
 - Refactor versioning.
