@@ -13,9 +13,12 @@ use v5.10.0;
 package perl5;
 use strict;
 use warnings;
-use feature ();
 
-use version 0.77; our $VERSION = version->parse('0.05')->stringify;
+use feature ();
+use version 0.77 ();
+use Hook::LexWrap 0.24;
+
+our $VERSION = '0.06';
 
 my $requested_perl_version = 0;
 
@@ -40,17 +43,15 @@ sub VERSION {
     }
 }
 
-sub import {
-    my ($class, $arg) = @_;
-    my $package = caller;
+sub version_check {
+    my ($class, $args) = @_;
 
-    if (defined $arg) {
-        my $version = $arg;
+    if (defined $args->[0]) {
+        my $version = $args->[0];
         $version =~ s/^-//;
         if (version::is_lax($version)) {
             $requested_perl_version = version->parse($version);
-            splice(@_, 1, 1);
-            $arg = $_[1];
+            shift(@$args);
         }
     }
     if ($requested_perl_version) {
@@ -59,6 +60,14 @@ sub import {
         eval "use $version";
         die $@ if $@;
     }
+}
+
+sub import {
+    my $class = shift;
+    my $package = caller;
+
+    $class->version_check(\@_);
+    my $arg = shift;
 
     if ($class ne 'perl5') {
         (my $usage = $class) =~ s/::/-/;
@@ -82,7 +91,7 @@ sub import {
     {
         no strict 'refs';
         if (defined &{"${perl5_class}::import"}) {
-            splice(@_, 0, 1, $perl5_class);
+            unshift(@_, $perl5_class);
             goto &{"${perl5_class}::import"};
         }
     }
@@ -97,6 +106,17 @@ $code
 ;1;
 ...
     }
+}
+
+sub importer {
+}
+
+sub imports {
+    return [
+        'strict',
+        'warnings',
+        'feature' => [':5.10'],
+    ];
 }
 
 use constant code => '';
