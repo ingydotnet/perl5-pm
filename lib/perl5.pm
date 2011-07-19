@@ -102,9 +102,10 @@ sub importer {
             ? shift(@imports) : undef;
         push @wrappers, wrap important => post => sub {
             eval "use $name $version (); 1" or die $@;
+            my $importee = $name->can('import') or return;
             return if $arguments and not @$arguments;
             @_ = ($name, @{$arguments || []});
-            goto &{$name->can('import')};
+            goto &{$importee};
         }
     }
 
