@@ -1,4 +1,9 @@
 ---
+version: 0.08
+date:    Tue Jul 19 06:33:06 PDT 2011
+changes:
+- Apply changes to support lack of import sub for modules from audreyt++
+---
 version: 0.07
 date:    Mon Jul 18 17:14:13 PDT 2011
 changes:
