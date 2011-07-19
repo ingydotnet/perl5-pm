@@ -1,6 +1,6 @@
 ##
 # name:      perl5
-# abstract:  Use a Bunch of Modules in One Go
+# abstract:  Use a Perl 5 group of modules/features
 # author:    Ingy döt Net <ingy@ingy.net>
 # license:   perl
 # copyright: 2011
@@ -9,23 +9,26 @@
 # - perl5::i
 # - perl5::ingy
 
+# To do:
+# - Turn die to croak (with tests)
+
 use v5.10.0;
 package perl5;
 use strict;
 use warnings;
 
-use feature ();
 use version 0.77 ();
 use Hook::LexWrap 0.24;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my $requested_perl_version = 0;
+my $perl_version = 10;
 
 sub VERSION {
     my ($class, $version) = @_;
     $version = version->parse($version);
-    if ($version <= 9.999999) {
+    if ($version < 10) {
         my $this_version = do {
             no strict 'refs';
             version->parse(${$class . '::VERSION'});
@@ -49,23 +52,23 @@ sub version_check {
     if (defined $args->[0]) {
         my $version = $args->[0];
         $version =~ s/^-//;
-        if (version::is_lax($version)) {
+        if (version::is_lax($version) and version->parse($version) >= 10) {
             $requested_perl_version = version->parse($version);
             shift(@$args);
         }
     }
     if ($requested_perl_version) {
         my $version = $requested_perl_version->numify / 1000 + 5;
+        $perl_version = $requested_perl_version;
         $requested_perl_version = 0;
         eval "use $version";
-        die $@ if $@;
+        do { require Carp; Carp::croak($@) } if $@;
     }
 }
 
 sub import {
+    return unless @_; # XXX not sure why
     my $class = shift;
-    my $package = caller;
-
     $class->version_check(\@_);
     my $arg = shift;
 
@@ -73,8 +76,7 @@ sub import {
         (my $usage = $class) =~ s/::/-/;
         die "Don't 'use $class'. Try 'use $usage'";
     }
-    die "Two many arguments for 'use perl5...'"
-        if @_;
+    die "Too many arguments for 'use perl5...'" if @_;
 
     my $subclass =
         not(defined($arg)) ? __PACKAGE__ :
@@ -83,7 +85,7 @@ sub import {
     eval "require $subclass; 1" or die $@;
 
     @_ = ($subclass);
-    goto $class->can('importer');
+    goto &{$class->can('importer')};
 }
 
 sub important {}
@@ -102,7 +104,7 @@ sub importer {
             eval "use $name $version (); 1" or die $@;
             return if $arguments and not @$arguments;
             @_ = ($name, @{$arguments || []});
-            goto $name->can('import');
+            goto &{$name->can('import')};
         }
     }
 
@@ -111,10 +113,11 @@ sub importer {
 }
 
 sub imports {
+    my $subversion = int($perl_version);
     return (
         'strict',
         'warnings',
-        'feature' => [':5.10'],
+        'feature' => [":5.$subversion"],
     );
 }
 
@@ -133,7 +136,7 @@ Use a bundled feature set from a C<perl5> plugin:
 
     use perl5-i;
     use perl5-2i;
-    use perl5-ingy;
+    use perl5-modern;
     use perl5-yourShinyPlugin;
 
 Or both:
@@ -164,18 +167,8 @@ Is equivalent in Perl to:
 The C<perl5> module takes the first argument in the C<use> command, and uses
 it to find a plugin, like C<perl5::foo> in this case.
 
-C<perl5::foo> is typically just a subclass of L<perl5::base>. It invoke a set
-of modules for its caller.
-
-If you use C<perl5> with no arguments, like this:
-
-    use perl5;
-
-It is the same as saying:
-
-    use 5.010;
-    use strict;
-    use warnings;
+C<perl5::foo> is typically just a subclass of L<perl5>. It invokes a set of
+modules for its caller.
 
 If you use it with a version, like this:
 
@@ -188,7 +181,19 @@ It is the same as saying:
     use warnings;
     use feature ':5.14';
 
-=head1 API
+If you use C<perl5> with no arguments, like this:
+
+    use perl5;
+
+It is the same as saying:
+
+    use perl5 v10;
+
+=head1 PLUGIN API
+
+This module uses lexically-wrapped-goto-chaining-magic to correctly load a set
+of modules (including optional version requirements and import options) into
+the user's code. The API for specifying a perl5 plugin is very simple.
 
 To create a plugin called C<perl5::foo> that gets called like this:
 
@@ -224,10 +229,9 @@ of Perl modules for all of us.
     THIS IS PERL! THERE ARE NO STANDARDS!
 
 ...and I told him so. I also promised that I would show him my feelings in
-code. Schwern, I<this> is how I feel! See also L<perl5::i>.
-
-DISCLAIMER: Mr Schwern has my full love and respect, and knows it well. :)
+code. Schwern, I<this> is how I feel! (See also: L<perl5::i>)
 
 =head1 THANKS
 
-Special thanks to mst, audreyt and obra for ideas and support.
+Special thanks to schwern, mstrout, audreyt, rodrigo and jesse for ideas and
+support.
