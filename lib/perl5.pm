@@ -107,6 +107,11 @@ sub importer {
             return if $arguments and not @$arguments;
             my $importee = $name->can('import') or return;
             @_ = ($name, @{$arguments || []});
+
+            # XXX This hack seems to make Exporter happy in t/export.t
+            # The answers lie within lexwrap and exporter. Need to dig deeper.
+            $Exporter::ExportLevel = 2;
+
             goto &$importee;
         };
     }
