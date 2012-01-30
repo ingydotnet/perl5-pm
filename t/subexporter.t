@@ -8,7 +8,7 @@ use lib 't/lib';
 
 {
     package test2;
-    use perl5-texp;
+    use perl5-tsubexp;
 }
 
 ok defined(&test1::bar),
