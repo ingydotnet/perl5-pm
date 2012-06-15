@@ -17,8 +17,7 @@ package perl5;
 use strict;
 use warnings;
 
-use version 0.77 ();
-use Hook::LexWrap 0.24;
+use version 0.99 ();
 
 our $VERSION = '0.08';
 
@@ -88,12 +87,10 @@ sub import {
     goto &{$class->can('importer')};
 }
 
+our @IMPORT_ARGS;
 sub importer {
     my $class = shift;
     my @imports = scalar(@_) ? @_ : $class->imports;
-    my @wrappers;
-
-    my $important = sub {};
 
     while (@imports) {
         my $name = shift(@imports);
@@ -102,21 +99,16 @@ sub importer {
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
             ? shift(@imports) : undef;
 
-        $important = wrap $important => post => sub {
-            eval "use $name $version (); 1" or die $@;
-            return if $arguments and not @$arguments;
-            my $importee = $name->can('import') or return;
-            @_ = ($name, @{$arguments || []});
+        eval "use $name $version (); 1" or die $@;
+        return if $arguments and not @$arguments;
+        my $importee = $name->can('import') or return;
 
-            # XXX This hack seems to make Exporter happy in t/export.t
-            # The answers lie within lexwrap and exporter. Need to dig deeper.
-            $Exporter::ExportLevel = 2;
-
-            goto &$importee;
-        };
+        my $caller = caller(0);
+        @IMPORT_ARGS = $arguments ? @$arguments : ();
+        eval "package $caller; $name\->import( \@perl5::IMPORT_ARGS ); 1" or die $@;
     }
 
-    goto &$important;
+    return;
 }
 
 sub imports {
