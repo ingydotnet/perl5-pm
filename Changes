@@ -1,4 +1,9 @@
 ---
+version: 0.09
+date:
+changes:
+- Properly import symbols in to the caller's namespace.
+---
 version: 0.08
 date:    Tue Jul 19 06:33:06 PDT 2011
 changes:

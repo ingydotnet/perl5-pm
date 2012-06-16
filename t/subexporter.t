@@ -1,4 +1,9 @@
 use Test::More 0.88;
+BEGIN {
+    eval { require Sub::Exporter };
+    plan skip_all => 'Sub::Exporter is not installed' if $@;
+}
+
 use lib 't/lib';
 
 {
