@@ -18,6 +18,7 @@ use strict;
 use warnings;
 
 use version 0.99 ();
+use Carp ();
 
 our $VERSION = '0.08';
 
@@ -61,7 +62,7 @@ sub version_check {
         $perl_version = $requested_perl_version;
         $requested_perl_version = 0;
         eval "use $version";
-        do { require Carp; Carp::croak($@) } if $@;
+        do { Carp::croak($@) } if $@;
     }
 }
 
