@@ -101,10 +101,10 @@ sub importer {
 
         eval "use $name $version (); 1" or die $@;
         return if $arguments and not @$arguments;
-        my $importee = $name->can('import') or return;
+        return if !$name->can('import');
 
         my $caller = caller(0);
-        @IMPORT_ARGS = $arguments ? @$arguments : ();
+        local @IMPORT_ARGS = $arguments ? @$arguments : ();
         eval "package $caller; $name\->import( \@perl5::IMPORT_ARGS ); 1" or die $@;
     }
 
