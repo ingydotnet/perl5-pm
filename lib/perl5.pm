@@ -18,6 +18,7 @@ use strict;
 use warnings;
 
 use version 0.99 ();
+use Carp ();
 
 our $VERSION = '0.09';
 
@@ -33,7 +34,6 @@ sub VERSION {
             version->parse(${$class . '::VERSION'});
         };
         if ($version > $this_version) {
-            require Carp;
             Carp::croak(
                 "$class version $version required" .
                 "--this is only version $this_version"
@@ -61,7 +61,7 @@ sub version_check {
         $perl_version = $requested_perl_version;
         $requested_perl_version = 0;
         eval "use $version";
-        do { require Carp; Carp::croak($@) } if $@;
+        do { Carp::croak($@) } if $@;
     }
 }
 

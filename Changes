@@ -1,6 +1,6 @@
 ---
 version: 0.09
-date:    
+date:    Tue Jun 19 15:01:03 UTC 2012
 changes:
 - barefootcoder++ bluefeet++ and tobyink++ led to switching out Hook::LexWrap
   with logic from Import::Into. Things are much cleaner now, and actually
