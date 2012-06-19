@@ -17,7 +17,7 @@ package perl5;
 use strict;
 use warnings;
 
-use version 0.77 ();
+use version 0.99 ();
 use Hook::LexWrap 0.24;
 
 our $VERSION = '0.08';
