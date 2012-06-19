@@ -1,4 +1,4 @@
-use Test::More tests => 31;
+use Test::More tests => 30;
 use lib 't/lib';
 
 test_usage1($_) for split "\n", <<'';

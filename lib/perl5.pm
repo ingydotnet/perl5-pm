@@ -18,9 +18,8 @@ use strict;
 use warnings;
 
 use version 0.99 ();
-use Hook::LexWrap 0.24;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $requested_perl_version = 0;
 my $perl_version = 10;
@@ -93,7 +92,8 @@ sub importer {
     my @imports = scalar(@_) ? @_ : $class->imports;
     my @wrappers;
 
-    my $important = sub {};
+    my $caller = caller(0);  # maybe allow 'use perl5-foo package=>Bar'?
+    my $important = eval "package $caller; my \$sub = sub { shift->import(\@_) };";
 
     while (@imports) {
         my $name = shift(@imports);
@@ -102,21 +102,12 @@ sub importer {
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
             ? shift(@imports) : undef;
 
-        $important = wrap $important => post => sub {
-            eval "use $name $version (); 1" or die $@;
-            return if $arguments and not @$arguments;
-            my $importee = $name->can('import') or return;
-            @_ = ($name, @{$arguments || []});
-
-            # XXX This hack seems to make Exporter happy in t/export.t
-            # The answers lie within lexwrap and exporter. Need to dig deeper.
-            $Exporter::ExportLevel = 2;
-
-            goto &$importee;
-        };
+        eval "require $name;"; # could be improved
+        $name->VERSION($version) if $version;
+        $name->$important(@{$arguments||[]});
     }
 
-    goto &$important;
+#    goto &$important;
 }
 
 sub imports {
