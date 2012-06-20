@@ -1,6 +1,7 @@
 use Test::More 0.88;
-use Test::Exception;
 use lib 't/lib';
+
+BEGIN { plan skip_all => 'Perl version too low to test switch feature' unless $] >= 5.010 };
 
 use perl5-tlex;
 
@@ -11,8 +12,8 @@ like $@, qr/requires explicit package name/, 'got strict';
 eval '6 + "fred"';
 like $@, qr/isn't numeric/, 'got fatal warnings';
 
-#eval 'try {die} catch {};';
-#is $@, '', 'try/catch syntax imported';
+eval 'given (1) { when (1) {} }';
+is $@, '', 'switch syntax imported';
 
 
 done_testing;
