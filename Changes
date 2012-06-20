@@ -1,4 +1,11 @@
 ---
+version: 0.09
+date:    Tue Jun 19 15:01:03 UTC 2012
+changes:
+- barefootcoder++ bluefeet++ and tobyink++ led to switching out Hook::LexWrap
+  with logic from Import::Into. Things are much cleaner now, and actually
+  export correctly (as far as we know :)
+---
 version: 0.08
 date:    Tue Jul 19 06:33:06 PDT 2011
 changes:
