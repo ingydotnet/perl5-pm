@@ -90,7 +90,6 @@ sub import {
 sub importer {
     my $class = shift;
     my @imports = scalar(@_) ? @_ : $class->imports;
-    my @wrappers;
 
     my $caller = caller(0);  # maybe allow 'use perl5-foo package=>Bar'?
     my $important = eval "package $caller; my \$sub = sub { shift->import(\@_) };";
