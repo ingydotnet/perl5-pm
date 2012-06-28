@@ -99,11 +99,11 @@ sub importer {
         my $version = (@imports and version::is_lax($imports[0]))
             ? version->parse(shift(@imports))->numify : '';
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
-            ? shift(@imports) : undef;
+            ? shift(@imports) : [];
 
         eval "require $name;"; # could be improved
         $name->VERSION($version) if $version;
-        $name->$important(@{$arguments||[]});
+        $name->$important(@$arguments);
     }
 
 #    goto &$important;
