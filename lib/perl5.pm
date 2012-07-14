@@ -19,6 +19,7 @@ use warnings;
 
 use version 0.99 ();
 use Carp ();
+use Module::Runtime qw< require_module >;
 
 our $VERSION = '0.09';
 
@@ -81,7 +82,7 @@ sub import {
         not(defined($arg)) ? __PACKAGE__ :
         $arg =~ /^-(\w+)$/ ?__PACKAGE__ . "::$1" :
         die "'$arg' is an invalid first argument to 'use perl5...'";
-    eval "require $subclass; 1" or die $@;
+    require_module($subclass);
 
     @_ = ($subclass);
     goto &{$class->can('importer')};
@@ -101,7 +102,7 @@ sub importer {
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
             ? shift(@imports) : [];
 
-        eval "require $name; 1" or die $@; # could be improved
+        require_module($name);
         $name->VERSION($version) if $version;
         $name->$important(@$arguments);
     }
