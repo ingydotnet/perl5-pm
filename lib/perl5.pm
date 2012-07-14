@@ -101,7 +101,7 @@ sub importer {
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
             ? shift(@imports) : [];
 
-        eval "require $name;"; # could be improved
+        eval "require $name; 1" or die $@; # could be improved
         $name->VERSION($version) if $version;
         $name->$important(@$arguments);
     }
