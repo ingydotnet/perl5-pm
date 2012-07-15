@@ -19,7 +19,7 @@ use warnings;
 
 use version 0.99 ();
 use Carp ();
-use Module::Runtime qw< require_module >;
+use Module::Runtime qw< require_module use_module >;
 
 our $VERSION = '0.09';
 
@@ -98,12 +98,11 @@ sub importer {
     while (@imports) {
         my $name = shift(@imports);
         my $version = (@imports and version::is_lax($imports[0]))
-            ? version->parse(shift(@imports))->numify : '';
+            ? version->parse(shift(@imports))->numify : undef;
         my $arguments = (@imports and ref($imports[0]) eq 'ARRAY')
             ? shift(@imports) : [];
 
-        require_module($name);
-        $name->VERSION($version) if $version;
+        use_module($name, $version);
         $name->$important(@$arguments);
     }
 
