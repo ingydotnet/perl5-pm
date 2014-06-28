@@ -1,5 +1,7 @@
+use File::Basename;
+use lib dirname(__FILE__), dirname(__FILE__) . '/lib';
+
 use Test::More tests => 31;
-use lib 't/lib';
 
 test_usage1($_) for split "\n", <<'';
 use perl5 v10;
@@ -62,9 +64,9 @@ sub test_usage2 {
 }
 
 {
-    my $usage = "use t::subclass 8 ();";
+    my $usage = "use subclass 8 ();";
     eval $usage;
-    like $@, qr/^\Qt::subclass version 8 required--this is only version 1.23\E/,
+    like $@, qr/^\Qsubclass version 8 required--this is only version 1.23\E/,
         "'$usage' usage failed appropriately";
 }
 

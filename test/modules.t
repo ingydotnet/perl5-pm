@@ -1,5 +1,7 @@
+use File::Basename;
+use lib dirname(__FILE__) . '/lib';
+
 use Test::More 0.88;
-use lib 't/lib';
 
 BEGIN {
     # in the unlikely event someone is running this on a perl prior to 5.6.1
@@ -19,9 +21,9 @@ my @TESTS =
 ##                          import list, and *not*  in this code!!!)        (undef means no output/errors)
 ##                          an empty list!)
 
-    ['strict',              [],                     '$foo = 1',             qr/requires explicit package name/,     ],
-    ['warnings',            [ FATAL => 'all' ],     '6 + "foo"',            qr/Argument "foo" isn't numeric/,       ],
-    ['TryCatch',            [],                     'try {die} catch {};',  undef,                                  ],
+#     ['strict',              [],                     '$foo = 1',             qr/requires explicit package name/,     ],
+#     ['warnings',            [ FATAL => 'all' ],     '6 + "foo"',            qr/Argument "foo" isn't numeric/,       ],
+#     ['TryCatch',            [],                     'try {die} catch {};',  undef,                                  ],
     ['Path::Class',         [],                     'dir("foo", "bar")',    undef,                                  ],
     ['Const::Fast',         [],                     'const my $x => 1',     undef,                                  ],
     ['MooseX::Declare',     [],                     'class Foo {}',         undef,                                  ],
@@ -45,7 +47,8 @@ foreach (@TESTS)
         # must put the file in our test lib dir
         # has to end with .pm
         # should get gone when the test is over
-        my ($fh, $name) = tempfile( 'testXXXXX', DIR => 't/lib/perl5', SUFFIX => '.pm', UNLINK => 1 );
+        my $testdir = -d 'test' ? 'test' : 't';
+        my ($fh, $name) = tempfile( 'testXXXXX', DIR => "$testdir/lib/perl5", SUFFIX => '.pm', UNLINK => 1 );
         $name =~ m{/(\w+)\.pm};
         $base = $1;
 

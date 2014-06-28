@@ -1,5 +1,7 @@
+use File::Basename;
+use lib dirname(__FILE__) . '/lib';
+
 use Test::More 0.88;
-use lib 't/lib';
 
 {
     package test1;

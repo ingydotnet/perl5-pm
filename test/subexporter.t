@@ -4,7 +4,8 @@ BEGIN {
     plan skip_all => 'Sub::Exporter is not installed' if $@;
 }
 
-use lib 't/lib';
+use File::Basename;
+use lib dirname(__FILE__) . '/lib';
 
 {
     package test1;
