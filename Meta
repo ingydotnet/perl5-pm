@@ -1,7 +1,7 @@
 =meta: 0.0.1
 
 name: perl5
-version: 0.11
+version: 0.12
 abstract: Use a Perl 5 group of modules/features
 homepage: https://metacpan.org/release/perl5
 
@@ -18,6 +18,10 @@ author:
 requires:
   perl: 5.8.1
   version: 0.99
+
+test:
+  requires:
+    Module::Runtime: 0
 
 recommends:
   perl5::i: 0

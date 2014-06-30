@@ -1,4 +1,9 @@
 ---
+version: 0.12
+date:    Mon Jun 30 12:26:37 PDT 2014
+changes:
+- Add Module::Runtime testing prereq
+---
 version: 0.11
 date:    Fri Jun 27 18:58:07 PDT 2014
 changes:
