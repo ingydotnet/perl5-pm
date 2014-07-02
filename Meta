@@ -22,6 +22,8 @@ requires:
 test:
   requires:
     Module::Runtime: 0
+    Sub::Exporter: 0
+    Test::Exception: 0
 
 recommends:
   perl5::i: 0
