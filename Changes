@@ -1,4 +1,9 @@
 ---
+version: 0.13
+date:    Wed Jul  2 14:02:50 PDT 2014
+changes:
+- Fix issue-6
+---
 version: 0.12
 date:    Mon Jun 30 12:26:37 PDT 2014
 changes:

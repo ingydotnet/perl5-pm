@@ -20,6 +20,8 @@ install:
   Devel::Cover::Report::Coveralls
   Module::Runtime
   perl5::i
+  Sub::Exporter
+  Test::Exception
   version
 
 script:

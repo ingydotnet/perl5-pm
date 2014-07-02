@@ -1,7 +1,7 @@
 =meta: 0.0.1
 
 name: perl5
-version: 0.12
+version: 0.13
 abstract: Use a Perl 5 group of modules/features
 homepage: https://metacpan.org/release/perl5
 
