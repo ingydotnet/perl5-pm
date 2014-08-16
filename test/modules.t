@@ -46,8 +46,8 @@ foreach (@TESTS)
         # must put the file in our test lib dir
         # has to end with .pm
         # should get gone when the test is over
-        my $testdir = -d 'test' ? 'test' : 't';
-        my ($fh, $name) = tempfile( 'testXXXXX', DIR => "$testdir/lib/perl5", SUFFIX => '.pm', UNLINK => 1 );
+        my $t = -d 't' ? 't' : 'test';
+        my ($fh, $name) = tempfile( 'testXXXXX', DIR => "$t/lib/perl5", SUFFIX => '.pm', UNLINK => 1 );
         $name =~ m{/(\w+)\.pm};
         $base = $1;
 
