@@ -3,7 +3,7 @@
 
 use strict; use warnings;
 package perl5;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use version;
 use Carp ();
