@@ -1,5 +1,4 @@
-use File::Basename;
-use lib dirname(__FILE__) . '/lib';
+use lib (-e 't' ? 't' : 'test') . '/lib';
 
 use Test::More 0.88;
 

@@ -1,5 +1,5 @@
-use File::Basename;
-use lib dirname(__FILE__), dirname(__FILE__) . '/lib';
+my $t; use lib ($t = -e 't' ? 't' : 'test');
+use lib "$t/lib";
 
 use Test::More tests => 31;
 
