@@ -92,7 +92,7 @@ Write some code like this:
       return (
           strict =>
           warnings =>
-          features => [':5.10'],
+          feature => [':5.10'],
           SomeModule => 0.22,
           OtherModule => 0.33, [option1 => 2],
           Module => [],   # Don't invoke Module's import() method
